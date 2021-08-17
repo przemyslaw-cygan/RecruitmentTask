@@ -15,7 +15,8 @@ class PathPointViewModel {
     private let pathProvider: PathProvider
 
     private let disposeBag = DisposeBag()
-    private let sectionsSubject = PublishSubject<[PathPointSectionModel]>()
+    private let destinationSubject = PublishSubject<AppScreenDestination>()
+    private let sectionsSubject = BehaviorSubject<[PathPointSectionModel]>(value: [])
 
     init(pathName: String, pathPointIndex: Int, pathProvider: PathProvider) {
         self.pathName = pathName
@@ -25,6 +26,12 @@ class PathPointViewModel {
 }
 
 extension PathPointViewModel {
+    var destination: Driver<AppScreenDestination> {
+        destinationSubject
+            .asDriver(onErrorJustReturn: .error(error: nil))
+            .compactMap { $0 }
+    }
+
     var sections: Driver<[PathPointSectionModel]> {
         sectionsSubject
             .asDriver(onErrorJustReturn: [])
@@ -35,7 +42,7 @@ extension PathPointViewModel {
             .map { Self.createSections(for: $0) }
             .subscribe(
                 onNext: { [weak self] in self?.sectionsSubject.onNext($0) },
-                onError: { print($0) }
+                onError: { [weak self] in self?.destinationSubject.onNext(.error(error: $0)) }
             )
             .disposed(by: disposeBag)
     }
@@ -44,7 +51,7 @@ extension PathPointViewModel {
 private extension PathPointViewModel {
     static func createSections(for pathPoint: PathPoint) -> [PathPointSectionModel] {
         var sections = [PathPointSectionModel]()
-        sections.append(.mapSection(title: "map", items: [.pathPointMapItem(pathPoint: pathPoint)]))
+        sections.append(.mapSection(items: [.pathPointMapItem(pathPoint: pathPoint)]))
         var infoItems = [PathPointSectionItemModel]()
         infoItems.append(.pathPointInfoItem(name: "timestamp", value: String(pathPoint.timestamp)))
         infoItems.append(.pathPointInfoItem(name: "latitude", value: String(pathPoint.latitude)))
@@ -52,7 +59,7 @@ private extension PathPointViewModel {
         infoItems.append(.pathPointInfoItem(name: "altitude", value: String(pathPoint.altitude)))
         infoItems.append(.pathPointInfoItem(name: "distance", value: String(pathPoint.distance)))
         infoItems.append(.pathPointInfoItem(name: "accuracy", value: String(pathPoint.accuracy)))
-        sections.append(.infoSection(title: "info", items: infoItems))
+        sections.append(.infoSection(items: infoItems))
         return sections
     }
 }

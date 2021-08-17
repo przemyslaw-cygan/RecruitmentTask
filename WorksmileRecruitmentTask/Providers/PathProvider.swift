@@ -13,6 +13,17 @@ enum PathProviderError: Error {
     case pathPointNotFound
 }
 
+extension PathProviderError: LocalizedError {
+    var errorDescription: String? {
+        switch self {
+        case .pathNotFound:
+            return "Path not found"
+        case .pathPointNotFound:
+            return "Path Point not found"
+        }
+    }
+}
+
 protocol PathProvider {
     func getPath(with pathName: String) -> Observable<Path>
     func getPathPoint(with pathName: String, at index: Int) -> Observable<PathPoint>

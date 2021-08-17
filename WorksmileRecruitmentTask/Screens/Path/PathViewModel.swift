@@ -14,8 +14,9 @@ class PathViewModel {
     private let pathProvider: PathProvider
 
     private let disposeBag = DisposeBag()
-    private let sectionsSubject = BehaviorSubject<[PathSectionModel]>(value: [])
+    private let destinationSubject = PublishSubject<AppScreenDestination>()
     private let pathFilterSubject = BehaviorSubject<PathFilter>(value: .raw)
+    private let sectionsSubject = BehaviorSubject<[PathSectionModel]>(value: [])
 
     init(pathName: String, pathProvider: PathProvider) {
         self.pathName = pathName
@@ -24,6 +25,12 @@ class PathViewModel {
 }
 
 extension PathViewModel {
+    var destination: Driver<AppScreenDestination> {
+        destinationSubject
+            .asDriver(onErrorJustReturn: .error(error: nil))
+            .compactMap { $0 }
+    }
+
     var sections: Driver<[PathSectionModel]> {
         sectionsSubject
             .asDriver(onErrorJustReturn: [])
@@ -35,19 +42,25 @@ extension PathViewModel {
             .map { Self.createSections(for: $0) }
             .subscribe(
                 onNext: { [weak self] in self?.sectionsSubject.onNext($0) },
-                onError: { print($0) }
+                onError: { [weak self] in self?.destinationSubject.onNext(.error(error: $0)) }
             )
             .disposed(by: disposeBag)
     }
 
-    func setPathFilter(_ pathFilter: PathFilter) {
+    func apply(pathFilter: PathFilter) {
         pathFilterSubject.onNext(pathFilter)
     }
 
+    func select(pathIndex: Int) {
+        destinationSubject.onNext(.pathPoint(pathName: pathName, pathIndex: pathIndex))
+    }
+}
+
+private extension PathViewModel {
     static func createSections(for path: Path) -> [PathSectionModel] {
         var sections = [PathSectionModel]()
-        sections.append(.mapSection(title: "map", items: [.pathMapItem(path: path)]))
-        sections.append(.pointsSection(title: "points", items: path.map { .pathPointItem(pathPoint: $0) }))
+        sections.append(.mapSection(items: [.pathMapItem(path: path)]))
+        sections.append(.pointsSection(items: path.map { .pathPointItem(pathPoint: $0) }))
         return sections
     }
 }

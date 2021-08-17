@@ -8,8 +8,8 @@
 import RxDataSources
 
 enum PathSectionModel {
-    case mapSection(title: String, items: [Item])
-    case pointsSection(title: String, items: [Item])
+    case mapSection(items: [Item])
+    case pointsSection(items: [Item])
 }
 
 extension PathSectionModel: SectionModelType {
@@ -17,18 +17,18 @@ extension PathSectionModel: SectionModelType {
 
     var items: [Item] {
         switch self {
-        case .mapSection(_, let items),
-             .pointsSection(_, let items):
+        case .mapSection(let items),
+             .pointsSection(let items):
             return items
         }
     }
 
     init(original: PathSectionModel, items: [PathSectionItemModel]) {
         switch original {
-        case .mapSection(let title, _):
-            self = .mapSection(title: title, items: items)
-        case .pointsSection(let title, _):
-            self = .pointsSection(title: title, items: items)
+        case .mapSection(_):
+            self = .mapSection(items: items)
+        case .pointsSection(_):
+            self = .pointsSection(items: items)
         }
     }
 }
