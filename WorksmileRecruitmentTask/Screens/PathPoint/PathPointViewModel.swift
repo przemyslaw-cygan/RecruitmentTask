@@ -52,14 +52,32 @@ private extension PathPointViewModel {
     static func createSections(for pathPoint: PathPoint) -> [PathPointSectionModel] {
         var sections = [PathPointSectionModel]()
         sections.append(.mapSection(items: [.pathPointMapItem(pathPoint: pathPoint)]))
-        var infoItems = [PathPointSectionItemModel]()
-        infoItems.append(.pathPointInfoItem(name: "timestamp", value: String(pathPoint.timestamp)))
-        infoItems.append(.pathPointInfoItem(name: "latitude", value: String(pathPoint.latitude)))
-        infoItems.append(.pathPointInfoItem(name: "longitude", value: String(pathPoint.longitude)))
-        infoItems.append(.pathPointInfoItem(name: "altitude", value: String(pathPoint.altitude)))
-        infoItems.append(.pathPointInfoItem(name: "distance", value: String(pathPoint.distance)))
-        infoItems.append(.pathPointInfoItem(name: "accuracy", value: String(pathPoint.accuracy)))
-        sections.append(.infoSection(items: infoItems))
+        sections.append(.infoSection(items: [
+            .pathPointInfoItem(
+                name: AppString.PathPointScreen.pointInfoCellTimestamp.rawValue.localized,
+                value: String(pathPoint.timestamp)
+            ),
+            .pathPointInfoItem(
+                name: AppString.PathPointScreen.pointInfoCellLatitude.rawValue.localized,
+                value: String(pathPoint.latitude)
+            ),
+            .pathPointInfoItem(
+                name: AppString.PathPointScreen.pointInfoCellLongitude.rawValue.localized,
+                value: String(pathPoint.longitude)
+            ),
+            .pathPointInfoItem(
+                name: AppString.PathPointScreen.pointInfoCellAltitude.rawValue.localized,
+                value: String(pathPoint.altitude)
+            ),
+            .pathPointInfoItem(
+                name: AppString.PathPointScreen.pointInfoCellDistance.rawValue.localized,
+                value: String(pathPoint.distance)
+            ),
+            .pathPointInfoItem(
+                name: AppString.PathPointScreen.pointInfoCellAccuracy.rawValue.localized,
+                value: String(pathPoint.accuracy)
+            )
+        ]))
         return sections
     }
 }

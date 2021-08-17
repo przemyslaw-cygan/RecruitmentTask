@@ -17,9 +17,9 @@ extension PathProviderError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .pathNotFound:
-            return "Path not found"
+            return AppString.PathProviderError.pathNotFound.rawValue.localized
         case .pathPointNotFound:
-            return "Path Point not found"
+            return AppString.PathProviderError.pathNotFound.rawValue.localized
         }
     }
 }

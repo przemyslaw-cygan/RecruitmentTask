@@ -23,7 +23,7 @@ class PathPointTableViewCell: UITableViewCell {
 
 extension PathPointTableViewCell {
     func configure(pathPoint: PathPoint) {
-        infoView.name = "point"
+        infoView.name = AppString.PathScreen.pointCellLabel.rawValue.localized
         infoView.value = "\(pathPoint.latitude), \(pathPoint.longitude), \(pathPoint.altitude)"
     }
 }

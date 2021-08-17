@@ -50,7 +50,7 @@ extension PathPointViewController: ViewBuilder {
     }
 
     func setupProperties() {
-        title = "Path Point"
+        title = AppString.PathPointScreen.title.rawValue.localized
         tableView.separatorInset = .init(top: 10, left: 10, bottom: 10, right: 10)
     }
 }

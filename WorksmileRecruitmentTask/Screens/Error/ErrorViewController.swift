@@ -40,7 +40,7 @@ extension ErrorViewController: ViewBuilder {
     }
 
     func setupProperties() {
-        title = "Error"
+        title = AppString.ErrorScreen.title.rawValue.localized
         errorLabel.numberOfLines = 0
         errorLabel.textAlignment = .center
         errorLabel.text = error?.localizedDescription
