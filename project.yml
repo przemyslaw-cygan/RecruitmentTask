@@ -1,0 +1,27 @@
+name: WorksmileRecruitmentTask
+targets:
+  WorksmileRecruitmentTask:
+    type: application
+    platform: iOS
+    deploymentTarget: "13.0"
+    settings:
+      INFOPLIST_FILE: WorksmileRecruitmentTask/App/Info.plist
+      PRODUCT_BUNDLE_IDENTIFIER: com.example.WorksmileRecruitmentTask
+    sources: [WorksmileRecruitmentTask]
+    dependencies:
+      - package: RxSwift
+      - package: RxDataSources
+      - package: SnapKit
+    postCompileScripts:
+      - script: export PATH="$PATH:/opt/homebrew/bin"; swiftlint
+        name: Swiftlint
+packages:
+  RxSwift:
+    url: https://github.com/ReactiveX/RxSwift.git
+    from: 6.2.0
+  RxDataSources:
+    url: https://github.com/RxSwiftCommunity/RxDataSources.git
+    from: 5.0.0
+  SnapKit:
+    url: https://github.com/SnapKit/SnapKit.git
+    from: 5.0.0
