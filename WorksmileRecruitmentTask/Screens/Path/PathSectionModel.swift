@@ -9,6 +9,7 @@ import RxDataSources
 
 enum PathSectionModel {
     case mapSection(items: [Item])
+    case optionsSection(items: [Item])
     case pointsSection(items: [Item])
 }
 
@@ -18,6 +19,7 @@ extension PathSectionModel: SectionModelType {
     var items: [Item] {
         switch self {
         case .mapSection(let items),
+             .optionsSection(let items),
              .pointsSection(let items):
             return items
         }
@@ -27,6 +29,8 @@ extension PathSectionModel: SectionModelType {
         switch original {
         case .mapSection(_):
             self = .mapSection(items: items)
+        case .optionsSection(_):
+            self = .optionsSection(items: items)
         case .pointsSection(_):
             self = .pointsSection(items: items)
         }
@@ -35,5 +39,7 @@ extension PathSectionModel: SectionModelType {
 
 enum PathSectionItemModel {
     case pathMapItem(path: Path)
+    case pathDisplayModeItem(available: [PathDisplayMode], selected: PathDisplayMode)
+    case pathFilterItem(available: [PathFilter], selected: PathFilter)
     case pathPointItem(pathPoint: PathPoint)
 }

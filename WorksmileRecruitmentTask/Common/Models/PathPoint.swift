@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct PathPoint: Equatable {
+struct PathPoint: Equatable, Hashable {
     let timestamp: Int
     let latitude: Double
     let longitude: Double

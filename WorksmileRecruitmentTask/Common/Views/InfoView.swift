@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import MapKit
 import SnapKit
 
 class InfoView: UIView {
@@ -48,7 +47,7 @@ extension InfoView: ViewBuilder {
     func setupProperties() {
         mainStackView.axis = .vertical
         mainStackView.spacing = 5
-        nameLabel.textColor = .lightText
+        nameLabel.textColor = .secondaryLabel
         nameLabel.font = .systemFont(ofSize: 10)
         valueLabel.font = .systemFont(ofSize: 14)
     }

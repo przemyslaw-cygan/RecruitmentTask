@@ -8,6 +8,7 @@
 import UIKit
 import SnapKit
 import RxSwift
+import RxCocoa
 import RxDataSources
 
 class PathViewController: UIViewController {
@@ -60,6 +61,8 @@ extension PathViewController: TableDataSourceApplicable {
 
     func registerTableViewCells() {
         tableView.register(PathMapTableViewCell.self, forCellReuseIdentifier: "pathMapCell")
+        tableView.register(PathDisplayModeTableViewCell.self, forCellReuseIdentifier: "pathDisplayModeCell")
+        tableView.register(PathFilterTableViewCell.self, forCellReuseIdentifier: "pathFilterCell")
         tableView.register(PathPointTableViewCell.self, forCellReuseIdentifier: "pathPointCell")
     }
 
@@ -68,13 +71,13 @@ extension PathViewController: TableDataSourceApplicable {
             .drive(tableView.rx.items(dataSource: tableViewDataSource()))
             .disposed(by: disposeBag)
 
-        Observable.zip(tableView.rx.modelSelected(SectionModel.Item.self), tableView.rx.itemSelected)
+        tableView.rx.modelSelected(SectionModel.Item.self)
             .subscribe(onNext: { [weak self] in
                 switch $0 {
-                case .pathMapItem:
+                case .pathMapItem, .pathDisplayModeItem, .pathFilterItem:
                     return
-                case .pathPointItem:
-                    self?.viewModel.select(pathIndex: $1.row)
+                case .pathPointItem(let pathPoint):
+                    self?.viewModel.select(pathPoint: pathPoint)
                 }
             })
             .disposed(by: disposeBag)
@@ -82,7 +85,7 @@ extension PathViewController: TableDataSourceApplicable {
 
     func tableViewDataSource() -> RxTableViewSectionedReloadDataSource<SectionModel> {
         return .init(
-            configureCell: { dataSource, table, indexPath, _ in
+            configureCell: { [weak self] dataSource, table, indexPath, _ in
                 switch dataSource[indexPath] {
                 case .pathMapItem(let path):
                     let cell: PathMapTableViewCell = table.dequeueReusableCell(
@@ -90,6 +93,22 @@ extension PathViewController: TableDataSourceApplicable {
                         for: indexPath
                     )
                     cell.configure(path: path)
+                    return cell
+                case .pathDisplayModeItem(let available, let selected):
+                    let cell: PathDisplayModeTableViewCell = table.dequeueReusableCell(
+                        withIdentifier: "pathDisplayModeCell",
+                        for: indexPath
+                    )
+                    cell.configure(available: available, selected: selected)
+                    cell.delegate = self?.viewModel
+                    return cell
+                case .pathFilterItem(let available, let selected):
+                    let cell: PathFilterTableViewCell = table.dequeueReusableCell(
+                        withIdentifier: "pathFilterCell",
+                        for: indexPath
+                    )
+                    cell.configure(available: available, selected: selected)
+                    cell.delegate = self?.viewModel
                     return cell
                 case .pathPointItem(let pathPoint):
                     let cell: PathPointTableViewCell = table.dequeueReusableCell(

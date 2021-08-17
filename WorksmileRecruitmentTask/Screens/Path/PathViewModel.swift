@@ -15,8 +15,9 @@ class PathViewModel {
 
     private let disposeBag = DisposeBag()
     private let destinationSubject = PublishSubject<AppScreenDestination>()
+    private let pathSubject = BehaviorSubject<Path>(value: [])
     private let pathFilterSubject = BehaviorSubject<PathFilter>(value: .raw)
-    private let sectionsSubject = BehaviorSubject<[PathSectionModel]>(value: [])
+    private let pathDisplayModeSubject = BehaviorSubject<PathDisplayMode>(value: .all)
 
     init(pathName: String, pathProvider: PathProvider) {
         self.pathName = pathName
@@ -32,35 +33,67 @@ extension PathViewModel {
     }
 
     var sections: Driver<[PathSectionModel]> {
-        sectionsSubject
+        Observable.combineLatest(pathSubject, pathFilterSubject, pathDisplayModeSubject)
+            .map { Self.createSections(for: $0, filter: $1, displayMode: $2) }
             .asDriver(onErrorJustReturn: [])
     }
 
     func initialize() {
-        Observable.combineLatest(pathProvider.getPath(with: pathName), pathFilterSubject)
-            .map { $1.apply(for: $0) }
-            .map { Self.createSections(for: $0) }
+        pathProvider.getPath(with: pathName)
             .subscribe(
-                onNext: { [weak self] in self?.sectionsSubject.onNext($0) },
+                onNext: { [weak self] in self?.pathSubject.onNext($0) },
                 onError: { [weak self] in self?.destinationSubject.onNext(.error(error: $0)) }
             )
             .disposed(by: disposeBag)
     }
 
-    func apply(pathFilter: PathFilter) {
-        pathFilterSubject.onNext(pathFilter)
-    }
-
-    func select(pathIndex: Int) {
+    func select(pathPoint: PathPoint) {
+        guard
+            let path = try? pathSubject.value(),
+            let pathIndex = path.firstIndex(of: pathPoint)
+        else { return }
         destinationSubject.onNext(.pathPoint(pathName: pathName, pathIndex: pathIndex))
     }
 }
 
+extension PathViewModel: PathDisplayModeTableViewCellDelegate {
+    func didSelectPathDisplayMode(_ displayMode: PathDisplayMode) {
+        pathDisplayModeSubject.onNext(displayMode)
+    }
+}
+extension PathViewModel: PathFilterTableViewCellDelegate {
+    func didSelectPathFilter(_ filter: PathFilter) {
+        pathFilterSubject.onNext(filter)
+    }
+}
+
 private extension PathViewModel {
-    static func createSections(for path: Path) -> [PathSectionModel] {
+    static func createSections(for path: Path, filter: PathFilter, displayMode: PathDisplayMode) -> [PathSectionModel] {
+        let filteredPath = filter.apply(for: path)
+        let listPath: Path
+
+        switch displayMode {
+        case .all:
+            listPath = path
+        case .accepted:
+            listPath = filteredPath
+        case .rejected:
+            listPath = path.difference(from: filteredPath)
+        }
+
         var sections = [PathSectionModel]()
-        sections.append(.mapSection(items: [.pathMapItem(path: path)]))
-        sections.append(.pointsSection(items: path.map { .pathPointItem(pathPoint: $0) }))
+        sections.append(.mapSection(items: [.pathMapItem(path: filteredPath)]))
+        sections.append(.optionsSection(items: [
+            .pathFilterItem(
+                available: [.raw, .distance(max: 0.5), .distanceAlt(max: 0.5)],
+                selected: filter
+            ),
+            .pathDisplayModeItem(
+                available: [.all, .accepted, .rejected],
+                selected: displayMode
+            )
+        ]))
+        sections.append(.pointsSection(items: listPath.map { .pathPointItem(pathPoint: $0) }))
         return sections
     }
 }

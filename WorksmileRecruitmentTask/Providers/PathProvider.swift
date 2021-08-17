@@ -7,6 +7,7 @@
 
 import Foundation
 import RxSwift
+import RxCocoa
 
 enum PathProviderError: Error {
     case pathNotFound

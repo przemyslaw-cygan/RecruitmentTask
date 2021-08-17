@@ -8,6 +8,7 @@
 import UIKit
 import SnapKit
 import RxSwift
+import RxCocoa
 import RxDataSources
 
 class PathPointViewController: UIViewController {
@@ -66,10 +67,6 @@ extension PathPointViewController: TableDataSourceApplicable {
     func bindTableView() {
         viewModel.sections
             .drive(tableView.rx.items(dataSource: tableViewDataSource()))
-            .disposed(by: disposeBag)
-
-        tableView.rx.modelSelected(SectionModel.Item.self)
-            .bind { print($0) }
             .disposed(by: disposeBag)
     }
 

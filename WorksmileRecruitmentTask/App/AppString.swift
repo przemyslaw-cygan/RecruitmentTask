@@ -31,6 +31,18 @@ enum AppString {
         case pathNotFound = "pathProviderError.pathNotFound"
         case pathPointNotFound = "pathProviderError.pathPointNotFound"
     }
+
+    enum PathDisplayMode: String {
+        case all = "All"
+        case accepted = "Accepted"
+        case rejected = "Rejected"
+    }
+
+    enum PathFilter: String {
+        case raw = "All"
+        case distance = "< %.2f"
+        case distanceAlt = "< %.2f (alt)"
+    }
 }
 
 extension String {
