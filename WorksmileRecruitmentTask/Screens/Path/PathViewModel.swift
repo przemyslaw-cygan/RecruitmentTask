@@ -14,8 +14,8 @@ class PathViewModel {
     private let pathProvider: PathProvider
 
     private let disposeBag = DisposeBag()
-    private let destinationSubject = PublishSubject<AppScreenDestination>()
-    private let pathSubject = BehaviorSubject<Path>(value: [])
+    private let destinationSubject = PublishSubject<AppScreen>()
+    private let pathSubject = BehaviorSubject<Path?>(value: nil)
     private let pathFilterSubject = BehaviorSubject<PathFilter>(value: .raw)
     private let pathDisplayModeSubject = BehaviorSubject<PathDisplayMode>(value: .all)
 
@@ -26,7 +26,7 @@ class PathViewModel {
 }
 
 extension PathViewModel {
-    var destination: Driver<AppScreenDestination> {
+    var destination: Driver<AppScreen> {
         destinationSubject
             .asDriver(onErrorJustReturn: .error(error: nil))
             .compactMap { $0 }
@@ -34,7 +34,7 @@ extension PathViewModel {
 
     var sections: Driver<[PathSectionModel]> {
         Observable.combineLatest(pathSubject, pathFilterSubject, pathDisplayModeSubject)
-            .map { Self.createSections(for: $0, filter: $1, displayMode: $2) }
+            .compactMap { [weak self] in self?.createSections(for: $0, filter: $1, displayMode: $2) }
             .asDriver(onErrorJustReturn: [])
     }
 
@@ -68,32 +68,34 @@ extension PathViewModel: PathFilterTableViewCellDelegate {
 }
 
 private extension PathViewModel {
-    static func createSections(for path: Path, filter: PathFilter, displayMode: PathDisplayMode) -> [PathSectionModel] {
+    func createSections(for path: Path?, filter: PathFilter, displayMode: PathDisplayMode) -> [PathSectionModel] {
+        guard let path = path else { return [] }
+
         let filteredPath = filter.apply(for: path)
-        let listPath: Path
+        let listPath: Path = {
+            switch displayMode {
+            case .all:
+                return path
+            case .accepted:
+                return filteredPath
+            case .rejected:
+                return path.difference(from: filteredPath)
+            }
+        }()
 
-        switch displayMode {
-        case .all:
-            listPath = path
-        case .accepted:
-            listPath = filteredPath
-        case .rejected:
-            listPath = path.difference(from: filteredPath)
-        }
-
-        var sections = [PathSectionModel]()
-        sections.append(.mapSection(items: [.pathMapItem(path: filteredPath)]))
-        sections.append(.optionsSection(items: [
-            .pathFilterItem(
-                available: [.raw, .distance(max: 0.5), .distanceAlt(max: 0.5)],
-                selected: filter
-            ),
-            .pathDisplayModeItem(
-                available: [.all, .accepted, .rejected],
-                selected: displayMode
-            )
-        ]))
-        sections.append(.pointsSection(items: listPath.map { .pathPointItem(pathPoint: $0) }))
-        return sections
+        return [
+            .mapSection(items: [.pathMapItem(path: filteredPath)]),
+            .optionsSection(items: [
+                .pathFilterItem(
+                    available: [.raw, .distance(max: 0.5), .distanceAlt(max: 0.5)],
+                    selected: filter
+                ),
+                .pathDisplayModeItem(
+                    available: [.all, .accepted, .rejected],
+                    selected: displayMode
+                )
+            ]),
+            .pointsSection(items: listPath.map { .pathPointItem(pathPoint: $0) })
+        ]
     }
 }

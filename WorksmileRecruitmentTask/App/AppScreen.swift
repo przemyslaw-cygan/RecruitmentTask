@@ -1,5 +1,5 @@
 //
-//  AppScreenDestination.swift
+//  AppScreen.swift
 //  WorksmileRecruitmentTask
 //
 //  Created by Przemysław Cygan on 17/08/2021.
@@ -7,14 +7,14 @@
 
 import UIKit
 
-enum AppScreenDestination {
+enum AppScreen {
     case inital
     case path(pathName: String)
     case pathPoint(pathName: String, pathIndex: Int)
     case error(error: Error?)
 }
 
-extension AppScreenDestination {
+extension AppScreen {
     var viewController: UIViewController {
         switch self {
         case .inital:

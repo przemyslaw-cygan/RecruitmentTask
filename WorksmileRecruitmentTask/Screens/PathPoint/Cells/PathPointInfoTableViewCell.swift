@@ -29,17 +29,15 @@ extension PathPointInfoTableViewCell {
 }
 
 extension PathPointInfoTableViewCell: ViewBuilder {
-    func setupHierarchy() {
+    func setupViewHierarchy() {
         contentView.addSubview(infoView)
     }
 
-    func setupAutolayout() {
-        infoView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
-        }
+    func setupViewAutolayout() {
+        infoView.snp.makeConstraints { $0.edges.equalToSuperview() }
     }
 
-    func setupProperties() {
+    func setupViewProperties() {
         selectionStyle = .none
     }
 }

@@ -32,19 +32,19 @@ class InfoView: UIView {
 }
 
 extension InfoView: ViewBuilder {
-    func setupHierarchy() {
+    func setupViewHierarchy() {
         addSubview(mainStackView)
         mainStackView.addArrangedSubview(nameLabel)
         mainStackView.addArrangedSubview(valueLabel)
     }
 
-    func setupAutolayout() {
+    func setupViewAutolayout() {
         mainStackView.snp.makeConstraints {
             $0.edges.equalToSuperview().inset(UIEdgeInsets(top: 10, left: 20, bottom: 10, right: 20))
         }
     }
 
-    func setupProperties() {
+    func setupViewProperties() {
         mainStackView.axis = .vertical
         mainStackView.spacing = 5
         nameLabel.textColor = .secondaryLabel

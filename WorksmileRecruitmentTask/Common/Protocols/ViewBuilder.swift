@@ -8,15 +8,15 @@
 import Foundation
 
 protocol ViewBuilder {
-    func setupHierarchy()
-    func setupAutolayout()
-    func setupProperties()
+    func setupViewHierarchy()
+    func setupViewAutolayout()
+    func setupViewProperties()
 }
 
 extension ViewBuilder {
     func setupView() {
-        setupHierarchy()
-        setupAutolayout()
-        setupProperties()
+        setupViewHierarchy()
+        setupViewAutolayout()
+        setupViewProperties()
     }
 }

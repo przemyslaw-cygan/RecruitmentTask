@@ -16,10 +16,9 @@ protocol PathFilterTableViewCellDelegate: AnyObject {
 
 class PathFilterTableViewCell: UITableViewCell {
     weak var delegate: PathFilterTableViewCellDelegate?
+    private var pathFilters: [PathFilter]?
 
     private let disposeBag = DisposeBag()
-    private var pathFilters = [PathFilter]()
-
     private let segmentedControl = UISegmentedControl()
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -28,8 +27,8 @@ class PathFilterTableViewCell: UITableViewCell {
 
         segmentedControl.rx.selectedSegmentIndex
             .subscribe(onNext: { [weak self] index in
-                guard let self = self, self.pathFilters.indices.contains(index) else { return }
-                self.delegate?.didSelectPathFilter(self.pathFilters[index])
+                guard let pathFilters = self?.pathFilters, pathFilters.indices.contains(index) else { return }
+                self?.delegate?.didSelectPathFilter(pathFilters[index])
             })
             .disposed(by: disposeBag)
     }
@@ -42,26 +41,21 @@ class PathFilterTableViewCell: UITableViewCell {
 extension PathFilterTableViewCell {
     func configure(available: [PathFilter], selected: PathFilter) {
         pathFilters = available
-        segmentedControl.removeAllSegments()
-        available.enumerated().forEach {
-            segmentedControl.insertSegment(withTitle: $0.element.title, at: $0.offset, animated: false)
-        }
+        segmentedControl.setItems(available.map { $0.title })
         segmentedControl.selectedSegmentIndex = available.firstIndex(of: selected) ?? 0
     }
 }
 
 extension PathFilterTableViewCell: ViewBuilder {
-    func setupHierarchy() {
+    func setupViewHierarchy() {
         contentView.addSubview(segmentedControl)
     }
 
-    func setupAutolayout() {
-        segmentedControl.snp.makeConstraints {
-            $0.edges.equalToSuperview().inset(10)
-        }
+    func setupViewAutolayout() {
+        segmentedControl.snp.makeConstraints { $0.edges.equalToSuperview().inset(10) }
     }
 
-    func setupProperties() {
+    func setupViewProperties() {
         selectionStyle = .none
     }
 }

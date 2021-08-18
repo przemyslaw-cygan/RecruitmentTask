@@ -47,18 +47,30 @@ class MapView: UIView {
 }
 
 extension MapView: ViewBuilder {
-    func setupHierarchy() {
+    func setupViewHierarchy() {
         addSubview(mapView)
     }
 
-    func setupAutolayout() {
+    func setupViewAutolayout() {
         mapView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
     }
 
-    func setupProperties() {
+    func setupViewProperties() {
         mapView.delegate = self
+    }
+}
+
+extension MapView: MKMapViewDelegate {
+    func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
+        if let routePolyline = overlay as? MKPolyline {
+            let renderer = MKPolylineRenderer(polyline: routePolyline)
+            renderer.strokeColor = .systemRed
+            renderer.lineWidth = 1
+            return renderer
+        }
+        return MKOverlayRenderer()
     }
 }
 
@@ -95,17 +107,5 @@ private extension MapView {
             ))
         } }
         mapView.setRegion(MKCoordinateRegion(mapRect), animated: false)
-    }
-}
-
-extension MapView: MKMapViewDelegate {
-    func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
-        if let routePolyline = overlay as? MKPolyline {
-            let renderer = MKPolylineRenderer(polyline: routePolyline)
-            renderer.strokeColor = .systemRed
-            renderer.lineWidth = 1
-            return renderer
-        }
-        return MKOverlayRenderer()
     }
 }

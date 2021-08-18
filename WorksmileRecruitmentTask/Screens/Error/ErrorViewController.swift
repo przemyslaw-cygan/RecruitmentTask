@@ -9,9 +9,8 @@ import UIKit
 import SnapKit
 
 class ErrorViewController: UIViewController {
-    private let errorLabel = UILabel()
-
     private let error: Error?
+    private let errorLabel = UILabel()
 
     init(with error: Error?) {
         self.error = error
@@ -29,17 +28,15 @@ class ErrorViewController: UIViewController {
 }
 
 extension ErrorViewController: ViewBuilder {
-    func setupHierarchy() {
+    func setupViewHierarchy() {
         view.addSubview(errorLabel)
     }
 
-    func setupAutolayout() {
-        errorLabel.snp.makeConstraints {
-            $0.edges.equalToSuperview()
-        }
+    func setupViewAutolayout() {
+        errorLabel.snp.makeConstraints { $0.edges.equalToSuperview().inset(40) }
     }
 
-    func setupProperties() {
+    func setupViewProperties() {
         title = AppString.ErrorScreen.title.rawValue.localized
         errorLabel.numberOfLines = 0
         errorLabel.textAlignment = .center

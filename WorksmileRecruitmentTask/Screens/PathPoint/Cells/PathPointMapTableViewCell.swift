@@ -29,18 +29,18 @@ extension PathPointMapTableViewCell {
 }
 
 extension PathPointMapTableViewCell: ViewBuilder {
-    func setupHierarchy() {
+    func setupViewHierarchy() {
         contentView.addSubview(mapView)
     }
 
-    func setupAutolayout() {
+    func setupViewAutolayout() {
         mapView.snp.makeConstraints {
             $0.edges.equalToSuperview()
             $0.height.equalTo(320)
         }
     }
 
-    func setupProperties() {
+    func setupViewProperties() {
         selectionStyle = .none
     }
 }

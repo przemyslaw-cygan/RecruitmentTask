@@ -12,9 +12,9 @@ import RxCocoa
 import RxDataSources
 
 class PathPointViewController: UIViewController {
-    private let disposeBag = DisposeBag()
     private let viewModel: PathPointViewModel
 
+    private let disposeBag = DisposeBag()
     private let tableView = UITableView()
 
     init(with viewModel: PathPointViewModel) {
@@ -30,27 +30,21 @@ class PathPointViewController: UIViewController {
         super.viewDidLoad()
         setupView()
         setupTable()
-
-        viewModel.destination
-            .drive(onNext: { [weak self] in self?.handleDestination($0) })
-            .disposed(by: disposeBag)
-
+        bindViewModel()
         viewModel.initialize()
     }
 }
 
 extension PathPointViewController: ViewBuilder {
-    func setupHierarchy() {
+    func setupViewHierarchy() {
         view.addSubview(tableView)
     }
 
-    func setupAutolayout() {
-        tableView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
-        }
+    func setupViewAutolayout() {
+        tableView.snp.makeConstraints { $0.edges.equalToSuperview() }
     }
 
-    func setupProperties() {
+    func setupViewProperties() {
         title = AppString.PathPointScreen.title.rawValue.localized
         tableView.separatorInset = .init(top: 10, left: 10, bottom: 10, right: 10)
     }
@@ -95,7 +89,13 @@ extension PathPointViewController: TableDataSourceApplicable {
 }
 
 private extension PathPointViewController {
-    func handleDestination(_ destination: AppScreenDestination) {
+    func bindViewModel() {
+        viewModel.destination
+            .drive(onNext: { [weak self] in self?.handleDestination($0) })
+            .disposed(by: disposeBag)
+    }
+
+    func handleDestination(_ destination: AppScreen) {
         navigationController?.pushViewController(destination.viewController, animated: true)
     }
 }

@@ -12,9 +12,9 @@ import RxCocoa
 import RxDataSources
 
 class PathViewController: UIViewController {
-    private let disposeBag = DisposeBag()
     private let viewModel: PathViewModel
 
+    private let disposeBag = DisposeBag()
     private let tableView = UITableView()
 
     init(with viewModel: PathViewModel) {
@@ -30,27 +30,21 @@ class PathViewController: UIViewController {
         super.viewDidLoad()
         setupView()
         setupTable()
-
-        viewModel.destination
-            .drive(onNext: { [weak self] in self?.handleDestination($0) })
-            .disposed(by: disposeBag)
-
+        bindViewModel()
         viewModel.initialize()
     }
 }
 
 extension PathViewController: ViewBuilder {
-    func setupHierarchy() {
+    func setupViewHierarchy() {
         view.addSubview(tableView)
     }
 
-    func setupAutolayout() {
-        tableView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
-        }
+    func setupViewAutolayout() {
+        tableView.snp.makeConstraints { $0.edges.equalToSuperview() }
     }
 
-    func setupProperties() {
+    func setupViewProperties() {
         title = AppString.PathScreen.title.rawValue.localized
         tableView.separatorInset = .init(top: 10, left: 10, bottom: 10, right: 10)
     }
@@ -72,14 +66,7 @@ extension PathViewController: TableDataSourceApplicable {
             .disposed(by: disposeBag)
 
         tableView.rx.modelSelected(SectionModel.Item.self)
-            .subscribe(onNext: { [weak self] in
-                switch $0 {
-                case .pathMapItem, .pathDisplayModeItem, .pathFilterItem:
-                    return
-                case .pathPointItem(let pathPoint):
-                    self?.viewModel.select(pathPoint: pathPoint)
-                }
-            })
+            .subscribe(onNext: { [weak self] in self?.select(model: $0) })
             .disposed(by: disposeBag)
     }
 
@@ -124,7 +111,22 @@ extension PathViewController: TableDataSourceApplicable {
 }
 
 private extension PathViewController {
-    func handleDestination(_ destination: AppScreenDestination) {
+    func bindViewModel() {
+        viewModel.destination
+            .drive(onNext: { [weak self] in self?.handleDestination($0) })
+            .disposed(by: disposeBag)
+    }
+
+    func handleDestination(_ destination: AppScreen) {
         navigationController?.pushViewController(destination.viewController, animated: true)
+    }
+
+    func select(model: SectionModel.Item) {
+        switch model {
+        case .pathMapItem, .pathDisplayModeItem, .pathFilterItem:
+            return
+        case .pathPointItem(let pathPoint):
+            viewModel.select(pathPoint: pathPoint)
+        }
     }
 }
