@@ -1,13 +1,13 @@
-name: WorksmileRecruitmentTask
+name: RecruitmentTask
 targets:
-  WorksmileRecruitmentTask:
+  RecruitmentTask:
     type: application
     platform: iOS
     deploymentTarget: "13.0"
     settings:
-      INFOPLIST_FILE: WorksmileRecruitmentTask/App/Info.plist
-      PRODUCT_BUNDLE_IDENTIFIER: com.example.WorksmileRecruitmentTask
-    sources: [WorksmileRecruitmentTask]
+      INFOPLIST_FILE: RecruitmentTask/App/Info.plist
+      PRODUCT_BUNDLE_IDENTIFIER: com.example.RecruitmentTask
+    sources: [RecruitmentTask]
     dependencies:
       - package: RxSwift
       - package: RxDataSources

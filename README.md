@@ -1,4 +1,4 @@
-# WorksmileRecruitmentTask
+# RecruitmentTask
 
 ## How to use
 

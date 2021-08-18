@@ -1,0 +1,20 @@
+/* 
+  Localizable.strings
+  RecruitmentTask
+
+  Created by Przemysław Cygan on 17/08/2021.
+  
+*/
+
+"errorScreen.title" = "Error";
+"pathScreen.title" = "Path";
+"pathScreen.pointCell.label" = "Point";
+"pathPointScreen.title" = "Path Point";
+"pathPointScreen.pointInfoCell.timestamp" = "Timestamp";
+"pathPointScreen.pointInfoCell.latitude" = "Latitude";
+"pathPointScreen.pointInfoCell.longitude" = "Longitude";
+"pathPointScreen.pointInfoCell.altitude" = "Altitude";
+"pathPointScreen.pointInfoCell.distance" = "Distance";
+"pathPointScreen.pointInfoCell.accuracy" = "Accuracy";
+"pathProviderError.pathNotFound" = "Path Not Found";
+"pathProviderError.pathPointNotFound" = "Path Point NotFound";
